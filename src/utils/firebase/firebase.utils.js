@@ -4,6 +4,7 @@ import {
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -25,17 +26,34 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
+// Initialize Providers
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
+// Getting the Authentication
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+
+// Sign-in methods
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
+
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider);
+
+// Initializing the database
 
 export const db = getFirestore();
 
-export const createUserDocumentFromAuth = async (userAuth) => {
+// Creating a user document from the user authentication object (uid)
+
+export const createUserDocumentFromAuth = async (
+  userAuth,
+  additionInformation = {}
+) => {
+  if (!userAuth) return;
+
   // we want to get the authentication token from the login and store it in our firestore database
   const userDocRef = doc(db, "users", userAuth.uid);
   const userSnapshot = await getDoc(userDocRef);
@@ -48,15 +66,18 @@ export const createUserDocumentFromAuth = async (userAuth) => {
         displayName,
         email,
         createdAt,
+        ...additionInformation,
       });
     } catch (error) {
       console.log("error creating the user " + error.message);
     }
   }
 
-  // if user data exists
-
-  // else
-
   return userDocRef;
+};
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+
+  return createUserWithEmailAndPassword(auth, email, password);
 };
