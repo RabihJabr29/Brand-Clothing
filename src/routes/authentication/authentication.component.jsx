@@ -1,15 +1,16 @@
 import SignUpForm from "../../components/sign-up-form/sign-up-form.component";
 import SignInForm from "../../components/sign-in-form/sign-in-form.component";
 
+import "./authentication.route.scss";
+
 const Authentication = () => {
   return (
     <div>
-      <h1>This is the signin page</h1>
-      <div className="forms-container">
-        <div className="form-container">
+      <div className="authentication-container">
+        <div>
           <SignInForm />
         </div>
-        <div className="form-container">
+        <div>
           <SignUpForm />
         </div>
       </div>

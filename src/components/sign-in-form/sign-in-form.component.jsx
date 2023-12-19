@@ -41,10 +41,17 @@ const SignInForm = () => {
         console.log(response);
         resetFormFields();
       } catch (error) {
-        if (error.code === "auth/email-already-in-use") {
-          alert("Cannot create user. Email already in use");
-        } else {
-          console.log(error);
+        switch (error.code) {
+          case "auth/wrong-password":
+            alert("Incorrect password for email");
+            break;
+
+          case "auth/user-not-found":
+            alert("Email is incorrect");
+            break;
+
+          default:
+            console.log(error);
         }
       }
     }
@@ -78,7 +85,7 @@ const SignInForm = () => {
         />
         <div className="buttons-container">
           <Button type="submit">Sign In</Button>
-          <Button buttonType="google" onClick={signInWithGoogle}>
+          <Button type="button" buttonType="google" onClick={signInWithGoogle}>
             Google Sign in
           </Button>
         </div>
