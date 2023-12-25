@@ -15,8 +15,19 @@ const addCartItem = (cartItems, productToAdd) => {
   return [...cartItems, { ...productToAdd, quantity: 1 }];
 };
 
-const removeCartItem = (cartItems, ItemToBeRemoved) => {
-  return cartItems.filter((item) => item.id !== ItemToBeRemoved.id);
+const removeCartItem = (cartItems, ItemToBeRemoved, removeAll) => {
+  const existingCartItem = cartItems.find(
+    (cartItem) => cartItem.id === ItemToBeRemoved.id
+  );
+  if (removeAll || existingCartItem.quantity === 1) {
+    return cartItems.filter((item) => item.id !== ItemToBeRemoved.id);
+  }
+
+  return cartItems.map((item) =>
+    item.id === ItemToBeRemoved.id
+      ? { ...item, quantity: item.quantity - 1 }
+      : item
+  );
 };
 
 export const CartContext = createContext({
@@ -26,7 +37,6 @@ export const CartContext = createContext({
   addItemToCart: () => {},
   itemsCount: 0,
   removeItemFromCart: () => {},
-  handleIncreaseQuantityByOne: () => {},
   handleDecreaseQuantityByOne: () => {},
 });
 
@@ -47,8 +57,8 @@ export const CartProvider = ({ children }) => {
     setCartItems(addCartItem(cartItems, productToAdd));
   };
 
-  const removeItemFromCart = (ItemToBeRemoved) => {
-    setCartItems(removeCartItem(cartItems, ItemToBeRemoved));
+  const removeItemFromCart = (ItemToBeRemoved, removeAll) => {
+    setCartItems(removeCartItem(cartItems, ItemToBeRemoved, removeAll));
   };
 
   const handleDecreaseQuantityByOne = (item) => {
@@ -56,15 +66,6 @@ export const CartProvider = ({ children }) => {
       cartItems.map((cartItem) =>
         cartItem.id === item.id
           ? { ...cartItem, quantity: cartItem.quantity - 1 }
-          : cartItem
-      )
-    );
-  };
-  const handleIncreaseQuantityByOne = (item) => {
-    setCartItems(
-      cartItems.map((cartItem) =>
-        cartItem.id === item.id
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
           : cartItem
       )
     );
@@ -77,7 +78,6 @@ export const CartProvider = ({ children }) => {
     addItemToCart,
     itemsCount,
     removeItemFromCart,
-    handleIncreaseQuantityByOne,
     handleDecreaseQuantityByOne,
   };
 
