@@ -7,13 +7,15 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from "firebase/auth";
 import {
   getFirestore,
   doc, // this is to get the doc instance the others are for getting and setting the document data
   getDoc,
   setDoc,
+  collection,
+  writeBatch,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -49,8 +51,22 @@ export const signInWithGoogleRedirect = () =>
 
 export const db = getFirestore();
 
-// Creating a user document from the user authentication object (uid)
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = collection(db, collectionKey);
+  const batch = writeBatch(db);
+  objectsToAdd.forEach((object) => {
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
+  });
 
+  await batch.commit();
+  console.log("done");
+};
+
+// Creating a user document from the user authentication object (uid)
 export const createUserDocumentFromAuth = async (
   userAuth,
   additionInformation = {}
@@ -95,4 +111,5 @@ export const signOutUser = async () => {
   await signOut(auth);
 };
 
-export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback)
+export const onAuthStateChangedListener = (callback) =>
+  onAuthStateChanged(auth, callback);
