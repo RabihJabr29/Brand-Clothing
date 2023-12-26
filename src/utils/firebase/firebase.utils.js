@@ -16,6 +16,8 @@ import {
   setDoc,
   collection,
   writeBatch,
+  query,
+  getDocs,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -48,9 +50,9 @@ export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
 // Initializing the database
-
 export const db = getFirestore();
 
+// This is a one timer method that we launched using useEffect to populate the categories from withing the CategoriesContext with data=SHOP_DATA
 export const addCollectionAndDocuments = async (
   collectionKey,
   objectsToAdd
@@ -64,6 +66,21 @@ export const addCollectionAndDocuments = async (
 
   await batch.commit();
   console.log("done");
+};
+
+// get the categories data from the firestore database
+export const getCategoriesAndDocuments = async () => {
+  const collectionRef = collection(db, "categories");
+  const q = query(collectionRef);
+
+  const querySnapshot = await getDocs(q);
+  const categoryMap = querySnapshot.docs.reduce((accumulator, docSnapshot) => {
+    const { title, items } = docSnapshot.data();
+    accumulator[title.toLowerCase()] = items;
+    return accumulator;
+  }, {});
+
+  return categoryMap;
 };
 
 // Creating a user document from the user authentication object (uid)
