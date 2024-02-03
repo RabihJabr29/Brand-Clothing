@@ -3,9 +3,8 @@ import { useState } from "react";
 import FormInput from "../form-input/form-input.component";
 import Button, { BUTTON_TYPES_CLASSES } from "../button/button.component";
 import {
-  createUserDocumentFromAuth,
   signInAuthWithEmailAndPassword,
-  signInWithGooglePopup,
+  signInWithGoogleRedirect,
 } from "../../utils/firebase/firebase.utils";
 
 import "./sign-in-form.styles.scss";
@@ -25,7 +24,7 @@ const SignInForm = () => {
   };
 
   const signInWithGoogle = async () => {
-    await signInWithGooglePopup();
+    await signInWithGoogleRedirect();
   };
 
   const handleSubmit = async (event) => {
@@ -34,7 +33,7 @@ const SignInForm = () => {
       alert("Password should be at least 6 characters");
     } else {
       try {
-        const { user } = await signInAuthWithEmailAndPassword(email, password);
+        await signInAuthWithEmailAndPassword(email, password);
         resetFormFields();
       } catch (error) {
         switch (error.code) {
